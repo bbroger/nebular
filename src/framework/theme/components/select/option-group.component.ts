@@ -4,9 +4,20 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  */
 
-import { ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
-import { convertToBoolProperty } from '../helpers';
+import {
+  AfterContentInit,
+  ChangeDetectionStrategy,
+  Component,
+  ContentChildren,
+  HostBinding,
+  Input,
+  OnDestroy,
+  QueryList,
+} from '@angular/core';
+import { takeWhile } from 'rxjs/operators';
 
+import { convertToBoolProperty } from '../helpers';
+import { NbOptionComponent } from './option.component';
 
 @Component({
   selector: 'nb-option-group',
@@ -17,19 +28,57 @@ import { convertToBoolProperty } from '../helpers';
     <ng-content select="nb-option, ng-container"></ng-content>
   `,
 })
-export class NbOptionGroupComponent {
+export class NbOptionGroupComponent implements AfterContentInit, OnDestroy {
+
+  protected alive = true;
+
   @Input() title: string;
 
   @Input('disabled')
   set setDisabled(disabled: boolean) {
     this.disabled = convertToBoolProperty(disabled);
-  }
 
+    if (this.options) {
+      this.updateOptionsDisabledState();
+    }
+  }
   disabled: boolean = false;
 
   @HostBinding('class.disabled')
   get disabledClass(): boolean {
     return this.disabled;
+  }
+
+  @ContentChildren(NbOptionComponent, { descendants: true }) options: QueryList<NbOptionComponent<any>>;
+
+  ngAfterContentInit() {
+    if (this.options.length) {
+      this.asyncUpdateOptionsDisabledState();
+    }
+
+    this.options.changes
+      .pipe(takeWhile(() => this.alive))
+      .subscribe(() => this.asyncUpdateOptionsDisabledState());
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
+  }
+
+  /**
+   * Sets disabled state for each option to current group disabled state.
+   */
+  protected updateOptionsDisabledState(): void {
+    this.options.forEach((option: NbOptionComponent<any>) => option.setDisabledByGroupState(this.disabled));
+  }
+
+  /**
+   * Updates options disabled state after promise resolution.
+   * This way change detection will be triggered after options state updated.
+   * Use this method when updating options during change detection run (e.g. QueryList.changes, lifecycle hooks).
+   */
+  protected asyncUpdateOptionsDisabledState(): void {
+    Promise.resolve().then(() => this.updateOptionsDisabledState());
   }
 }
 

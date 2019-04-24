@@ -42,6 +42,9 @@ import { NbSelectComponent } from './select.component';
   `,
 })
 export class NbOptionComponent<T> implements OnDestroy {
+
+  protected disabledByGroup = false;
+
   /**
    * Option value that will be fired on selection.
    * */
@@ -100,7 +103,8 @@ export class NbOptionComponent<T> implements OnDestroy {
 
   @HostBinding('class.disabled')
   get disabledClass(): boolean {
-    return this.disabled;
+    const disabled = this.disabledByGroup || this.disabled;
+    return disabled;
   }
 
   @HostListener('click')
@@ -114,6 +118,16 @@ export class NbOptionComponent<T> implements OnDestroy {
 
   deselect() {
     this.setSelection(false);
+  }
+
+  /**
+   * Sets disabled by group state and marks component for check.
+   */
+  setDisabledByGroupState(disabled: boolean): void {
+    if (this.disabledByGroup !== disabled) {
+      this.disabledByGroup = disabled;
+      this.cd.markForCheck();
+    }
   }
 
   private setSelection(selected: boolean): void {
