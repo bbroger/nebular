@@ -6,7 +6,10 @@
 
 import { AfterViewInit, Directive, ElementRef, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 
-import { NbAdjustment, NbDynamicOverlay, NbDynamicOverlayHandler, NbPosition, NbTrigger } from '../cdk';
+import { NbAdjustment, NbPosition } from '../cdk/overlay/overlay-position';
+import { NbTrigger } from '../cdk/overlay/overlay-trigger';
+import { NbDynamicOverlay } from '../cdk/overlay/dynamic/dynamic-overlay';
+import { NbDynamicOverlayHandler } from '../cdk/overlay/dynamic/dynamic-overlay-handler';
 import { NbTooltipComponent } from './tooltip.component';
 
 /**
@@ -32,7 +35,7 @@ import { NbTooltipComponent } from './tooltip.component';
  * Tooltip can accept a hint text and/or an icon:
  * @stacked-example(With Icon, tooltip/tooltip-with-icon.component)
  *
- * Same way as Popover, tooltip can accept placement position with `nbTooltipPlacement` proprety:
+ * Same way as Popover, tooltip can accept placement position with `nbTooltipPlacement` property:
  * @stacked-example(Placements, tooltip/tooltip-placements.component)
  *
  * It is also possible to specify tooltip color using `nbTooltipStatus` property:

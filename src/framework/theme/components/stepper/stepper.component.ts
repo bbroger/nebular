@@ -11,6 +11,7 @@ import {
   QueryList,
 } from '@angular/core';
 import { convertToBoolProperty } from '../helpers';
+import { NB_STEPPER } from './stepper-tokens';
 import { NbStepComponent } from './step.component';
 
 export enum NbStepperOrientation {
@@ -96,6 +97,7 @@ export enum NbStepperOrientation {
   selector: 'nb-stepper',
   styleUrls: ['./stepper.component.scss'],
   templateUrl: './stepper.component.html',
+  providers: [{ provide: NB_STEPPER, useExisting: NbStepperComponent }],
 })
 export class NbStepperComponent {
 
