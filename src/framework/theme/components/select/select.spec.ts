@@ -84,7 +84,6 @@ export class NbSelectTestComponent {
   @Input() multiple: boolean;
   @Input() customLabel: boolean;
   @Output() selectedChange: EventEmitter<any> = new EventEmitter();
-  @ViewChild(NbSelectComponent) select: NbSelectComponent<any>;
   @ViewChildren(NbOptionComponent) options: QueryList<NbOptionComponent<any>>;
   groups = TEST_GROUPS;
 }
@@ -103,8 +102,6 @@ export class NbSelectTestComponent {
 export class NbSelectWithInitiallySelectedOptionComponent {
   @Input() selected = 1;
   @Input() options = [ 1, 2, 3 ];
-
-  @ViewChild(NbSelectComponent) select: NbSelectComponent<number>;
 }
 
 @Component({
@@ -125,8 +122,8 @@ export class NbReactiveFormSelectComponent {
   showSelect: boolean = true;
   formControl: FormControl = new FormControl();
 
-  @ViewChild(NbSelectComponent) selectComponent: NbSelectComponent<number>;
-  @ViewChild(NbOptionComponent) optionComponent: NbOptionComponent<number>;
+  @ViewChild(NbSelectComponent, { static: false }) selectComponent: NbSelectComponent<number>;
+  @ViewChild(NbOptionComponent, { static: false }) optionComponent: NbOptionComponent<number>;
 }
 
 @Component({
@@ -146,7 +143,7 @@ export class NbNgModelSelectComponent {
   options: number[] = [ 1 ];
   selectedValue: number = null;
 
-  @ViewChild(NbOptionComponent) optionComponent: NbOptionComponent<number>;
+  @ViewChild(NbOptionComponent, { static: false }) optionComponent: NbOptionComponent<number>;
 }
 
 @Component({
@@ -172,7 +169,6 @@ export class NbNgModelSelectComponent {
 export class NbSelectWithFalsyOptionValuesComponent {
   nanValue = NaN;
 
-  @ViewChild(NbSelectComponent) select: NbSelectComponent<any>;
   @ViewChildren(NbOptionComponent) options: QueryList<NbOptionComponent<any>>;
   @ViewChildren(NbOptionComponent, { read: ElementRef }) optionElements: QueryList<ElementRef<HTMLElement>>;
 
@@ -267,9 +263,9 @@ export class NbOptionDisabledTestComponent {
   optionGroupDisabled = false;
   optionDisabled = false;
 
-  @ViewChild(NbSelectComponent) selectComponent: NbSelectComponent<number>;
-  @ViewChild(NbOptionGroupComponent) optionGroupComponent: NbOptionGroupComponent;
-  @ViewChild(NbOptionComponent) optionComponent: NbOptionComponent<number>;
+  @ViewChild(NbSelectComponent, { static: false }) selectComponent: NbSelectComponent<number>;
+  @ViewChild(NbOptionGroupComponent, { static: false }) optionGroupComponent: NbOptionGroupComponent;
+  @ViewChild(NbOptionComponent, { static: false }) optionComponent: NbOptionComponent<number>;
 }
 
 describe('Component: NbSelectComponent', () => {
@@ -306,7 +302,7 @@ describe('Component: NbSelectComponent', () => {
     fixture = TestBed.createComponent(NbSelectTestComponent);
     overlayContainerService = TestBed.get(NbOverlayContainerAdapter);
     document = TestBed.get(NB_DOCUMENT);
-    select = fixture.componentInstance.select;
+    select = fixture.debugElement.query(By.directive(NbSelectComponent)).componentInstance;
 
     overlayContainer = document.createElement('div');
     overlayContainerService.setContainer(overlayContainer);
@@ -457,7 +453,10 @@ describe('Component: NbSelectComponent', () => {
     flush();
     selectFixture.detectChanges();
 
-    const selectedOption = selectFixture.componentInstance.select.options.find(o => o.selected);
+    const selectedOption = selectFixture.debugElement.query(By.directive(NbSelectComponent))
+      .componentInstance
+      .options.find(o => o.selected);
+
     expect(selectedOption.value).toEqual(selectFixture.componentInstance.selected);
     const selectButton = selectFixture.nativeElement.querySelector('nb-select button') as HTMLElement;
     expect(selectButton.textContent).toEqual(selectedOption.value.toString());
@@ -593,7 +592,7 @@ describe('NbSelectComponent - falsy values', () => {
 
     fixture = TestBed.createComponent(NbSelectWithFalsyOptionValuesComponent);
     testComponent = fixture.componentInstance;
-    select = testComponent.select;
+    select = fixture.debugElement.query(By.directive(NbSelectComponent)).componentInstance;
 
     fixture.detectChanges();
     flush();
@@ -673,7 +672,7 @@ describe('NbSelectComponent - falsy values', () => {
     beforeEach(fakeAsync(() => {
       fixture = TestBed.createComponent(NbMultipleSelectWithFalsyOptionValuesComponent);
       testComponent = fixture.componentInstance;
-      select = testComponent.select;
+      select = fixture.debugElement.query(By.directive(NbSelectComponent)).componentInstance;
 
       fixture.detectChanges();
       flush();

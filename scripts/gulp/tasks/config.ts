@@ -8,7 +8,6 @@ export const DEV_SCHEMATICS_PATH = './schematics';
 export const JS_PACKAGES = [
   'auth',
   'date-fns',
-  'eva-icons',
   'moment',
   'security',
   'theme',
